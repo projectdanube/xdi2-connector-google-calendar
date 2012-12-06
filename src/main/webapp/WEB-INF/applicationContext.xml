@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!-- XDI FILTER -->
+
+	<bean id="EndpointFilter" class="xdi2.server.EndpointFilter">
+		<property name="endpointServlet" ref="EndpointServlet" />
+	</bean>
+
+	<!-- XDI SERVLET -->
+
+	<bean id="EndpointServlet" class="xdi2.server.EndpointServlet" init-method="init" destroy-method="destroy">
+		<property name="interceptors">
+			<util:list>
+				<bean class="xdi2.server.interceptor.impl.DebugEndpointServletInterceptor" />
+			</util:list>
+		</property>
+	</bean>
+
+	<!-- GOOGLE CALENDAR CONNECTOR SERVLET -->
+
+	<bean id="ConnectServlet" class="xdi2.connector.google.calendar.ConnectServlet" init-method="init" destroy-method="destroy">
+		<property name="graph" ref="graph1" />
+		<property name="googleCalendarApi" ref="googleCalendarApi" />
+	</bean>
+
+	<!-- MESSAGING TARGET at /google-calendar -->
+	<!-- MessagingTarget: GraphMessagingTarget backed by a MemoryGraph -->
+
+	<bean id="graphfactory1" class="xdi2.core.impl.memory.MemoryGraphFactory">
+	</bean>
+
+	<bean id="graph1" factory-bean="graphfactory1" factory-method="openGraph" />
+
+	<bean id="googleCalendarMappingGraphfactory" class="xdi2.core.impl.wrapped.classpath.ClasspathGraphFactory">
+		<property name="classpath" value="/xdi2/connector/google/calendar/mapping/mapping.xdi" />
+		<property name="mimeType" value="text/xdi;contexts=0;ordered=1" />
+	</bean>
+
+	<bean id="googleCalendarMappingGraph" factory-bean="googleCalendarMappingGraphfactory" factory-method="openGraph" />
+
+	<bean id="googleCalendarContributor" class="xdi2.connector.google.calendar.contributor.GoogleCalendarContributor">
+		<property name="googleCalendarApi" ref="googleCalendarApi" />
+		<property name="googleCalendarMapping">
+			<bean class="xdi2.connector.google.calendar.mapping.googleCalendarMapping">
+				<property name="mappingGraph" ref="googleCalendarMappingGraph" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="googleCalendarApi" class="xdi2.connector.google.calendar.api.GoogleCalendarApi" init-method="init" destroy-method="destroy">
+		<property name="appId" value="APPID" />
+		<property name="appSecret" value="APPSECRET" />
+	</bean>
+
+	<bean name="/google-calendar" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
+		<property name="graph" ref="graph1" />
+		<property name="interceptors">
+			<util:list>
+				<bean class="xdi2.messaging.target.interceptor.impl.BootstrapInterceptor">
+					<property name="bootstrapOwner" value="=!1111" />
+					<property name="bootstrapSharedSecret" value="s3cret" />
+					<property name="bootstrapLinkContract" value="true" />
+				</bean>
+				<bean class="xdi2.messaging.target.interceptor.impl.VariablesInterceptor" />
+				<bean class="xdi2.messaging.target.interceptor.impl.DollarIsInterceptor" />
+				<bean class="xdi2.messaging.target.interceptor.impl.CheckOwnerInterceptor" />
+				<ref bean="googleCalendarContributor" />
+			</util:list>
+		</property>
+		<property name="contributors">
+			<util:map>
+				<entry key="+(https://www.googleapis.com/calendar/)" value-ref="googleCalendarContributor" />
+			</util:map>
+		</property>
+	</bean>
+
+	<!-- MESSAGING TARGET at /mapping -->
+	<!-- MessagingTarget: GraphMessagingTarget -->
+
+	<bean name="/mapping" class="xdi2.messaging.target.impl.graph.GraphMessagingTarget">
+		<property name="graph" ref="googleCalendarMappingGraph" />
+	</bean>
+
+</beans>
