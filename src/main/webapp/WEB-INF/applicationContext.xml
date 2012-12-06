@@ -44,7 +44,7 @@
 	<bean id="googleCalendarContributor" class="xdi2.connector.google.calendar.contributor.GoogleCalendarContributor">
 		<property name="googleCalendarApi" ref="googleCalendarApi" />
 		<property name="googleCalendarMapping">
-			<bean class="xdi2.connector.google.calendar.mapping.googleCalendarMapping">
+			<bean class="xdi2.connector.google.calendar.mapping.GoogleCalendarMapping">
 				<property name="mappingGraph" ref="googleCalendarMappingGraph" />
 			</bean>
 		</property>
