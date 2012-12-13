@@ -3,10 +3,8 @@ package xdi2.connector.google.calendar.mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2RuntimeException;
-import xdi2.core.features.dictionary.Dictionary;
 import xdi2.core.features.multiplicity.Multiplicity;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIReaderRegistry;
@@ -45,7 +43,7 @@ public class GoogleCalendarMapping {
 
 	/**
 	 * Converts a Google Calender calendar XRI to a native Google Calendar calendar identifier.
-	 * Example: $(calendar)$(!123) --> 123
+	 * Example: $(+calendar)$(!123) --> 123
 	 */
 	public String calendarXriToCalendarIdentifier(XDI3Segment calendarXri) {
 
@@ -53,18 +51,19 @@ public class GoogleCalendarMapping {
 
 		// convert
 
-		String calenderIdentifier = Multiplicity.baseArcXri(calendarXri.getSubSegment(1)).toString();
+		String calendarIdentifier = (calendarXri.getNumSubSegments() < 2) ? null : Multiplicity.baseArcXri(calendarXri.getSubSegment(1)).toString();
+		if (calendarIdentifier != null && calendarIdentifier.startsWith("!")) calendarIdentifier = calendarIdentifier.substring(1);
 
 		// done
 
-		if (log.isDebugEnabled()) log.debug("Converted " + calendarXri + " to " + calenderIdentifier);
+		if (log.isDebugEnabled()) log.debug("Converted " + calendarXri + " to " + calendarIdentifier);
 
-		return calenderIdentifier;
+		return calendarIdentifier;
 	}
 
 	/**
 	 * Converts a Google Calender event XRI to a native Google Calendar event identifier.
-	 * Example: $(event)$(!567) --> 567
+	 * Example: $(+event)$(!567) --> 567
 	 */
 	public String eventXriToEventIdentifier(XDI3Segment eventXri) {
 
@@ -72,7 +71,8 @@ public class GoogleCalendarMapping {
 
 		// convert
 
-		String eventIdentifier = Multiplicity.baseArcXri(eventXri.getSubSegment(1)).toString();
+		String eventIdentifier = (eventXri.getNumSubSegments() < 2) ? null : Multiplicity.baseArcXri(eventXri.getSubSegment(1)).toString();
+		if (eventIdentifier != null && eventIdentifier.startsWith("!")) eventIdentifier = eventIdentifier.substring(1);
 
 		// done
 

@@ -1,6 +1,10 @@
 package xdi2.connector.google.calendar.contributor;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,10 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import xdi2.connector.google.calendar.api.GoogleCalendarApi;
 import xdi2.connector.google.calendar.mapping.GoogleCalendarMapping;
-import xdi2.connector.google.calendar.util.GraphUtil;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
+import xdi2.core.features.multiplicity.Multiplicity;
 import xdi2.core.xri3.impl.XDI3Segment;
+import xdi2.core.xri3.impl.XDI3SubSegment;
 import xdi2.messaging.GetOperation;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
@@ -134,7 +139,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 		}
 	}
 
-	@ContributorXri(addresses={"($calendar)($)"})
+	@ContributorXri(addresses={"$(+calendar)($)", "$(+calendar)"})
 	private class CalendarContributor extends AbstractContributor {
 
 		private CalendarContributor() {
@@ -153,29 +158,61 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 
 			log.debug("googleCalendarContextXri: " + googleCalendarContextXri + ", userXri: " + userXri + ", calendarXri: " + calendarXri);
 
-			// retrieve the calendar
+			// filter
 
-			Object calendar = null;
+			if (relativeContextNodeXri != null) return this.getContextFilter(contributorXris, relativeContextNodeXri, contextNodeXri, operation, messageResult, executionContext);
+
+			// parse identifiers
+
+			String calendarIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.calendarXriToCalendarIdentifier(calendarXri);
+
+			log.debug("calendarIdentifier: " + calendarIdentifier);
+
+			// retrieve the calendar list or calendar
+
+			List<String> calendarList = null;
+			Map<String, String> calendar = null;
 
 			try {
 
-				String calendarIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.calendarXriToCalendarIdentifier(calendarXri);
-				if (calendarIdentifier == null) return false;
+				// String accessToken = GraphUtil.retrieveAccessToken(GoogleCalendarContributor.this.getTokenGraph(), userXri);
+				// if (accessToken == null) throw new Exception("No access token.");
 
-				log.debug("calendarIdentifier: " + calendarIdentifier);
+				// JSONObject user = GoogleCalendarContributor.this.retrieveUser(executionContext, accessToken);
+				// if (user == null) throw new Exception("No user.");
 
-				// TODO: retrieve the calendar
+				if (calendarIdentifier == null) {
 
+					calendarList = new ArrayList<String> ();
+					calendarList.add("1234");
+					calendarList.add("1235");
+					calendarList.add("1236");
+				} else {
+
+					calendar = new HashMap<String, String> ();
+					calendar.put("summary", "Summary of Calendar " + calendarIdentifier);
+					calendar.put("description", "Description of Calendar " + calendarIdentifier);
+				}
 			} catch (Exception ex) {
 
 				throw new Xdi2MessagingException("Cannot load user data: " + ex.getMessage(), ex, null);
 			}
 
-			// add the calendar to the response
+			// add the calendar list or calendar to the response
+
+			if (calendarList != null) {
+
+				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
+				for (String calendarEntry : calendarList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(new XDI3SubSegment("!" + calendarEntry)));
+			}
 
 			if (calendar != null) {
 
-				// TODO
+				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
+				for (Map.Entry<String, String> entry : calendar.entrySet()) {
+
+					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(new XDI3SubSegment("+" + entry.getKey()))).createLiteral(entry.getValue());
+				}
 			}
 
 			// done
@@ -184,7 +221,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 		}
 	}
 
-	@ContributorXri(addresses={"($event)($)"})
+	@ContributorXri(addresses={"$(+event)($)", "$(+event)"})
 	private class EventContributor extends AbstractContributor {
 
 		private EventContributor() {
@@ -202,41 +239,62 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 
 			log.debug("googleCalendarContextXri: " + googleCalendarContextXri + ", userXri: " + userXri + ", calendarXri: " + calendarXri + ", eventXri: " + eventXri);
 
-			// retrieve the event value
+			// filter
 
-			String eventValue = null;
+			if (relativeContextNodeXri != null) return this.getContextFilter(contributorXris, relativeContextNodeXri, contextNodeXri, operation, messageResult, executionContext);
+
+			// parse identifiers
+
+			String calendarIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.calendarXriToCalendarIdentifier(calendarXri);
+			String eventIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.eventXriToEventIdentifier(eventXri);
+
+			log.debug("calendarIdentifier: " + calendarIdentifier + ", eventIdentifier: " + eventIdentifier);
+
+			// retrieve the event list or event
+
+			List<String> eventList = null;
+			Map<String, String> event = null;
 
 			try {
 
-				String calendarIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.calendarXriToCalendarIdentifier(calendarXri);
-				String eventIdentifier = GoogleCalendarContributor.this.googleCalendarMapping.eventXriToEventIdentifier(eventXri);
-				if (calendarIdentifier == null) return false;
-				if (eventIdentifier == null) return false;
+				// String accessToken = GraphUtil.retrieveAccessToken(GoogleCalendarContributor.this.getTokenGraph(), userXri);
+				// if (accessToken == null) throw new Exception("No access token.");
 
-				log.debug("calendarIdentifier: " + calendarIdentifier + ", eventIdentifier: " + eventIdentifier);
+				// JSONObject user = GoogleCalendarContributor.this.retrieveUser(executionContext, accessToken);
+				// if (user == null) throw new Exception("No user.");
 
-				String accessToken = GraphUtil.retrieveAccessToken(GoogleCalendarContributor.this.getTokenGraph(), userXri);
-				if (accessToken == null) throw new Exception("No access token.");
+				if (eventIdentifier == null) {
 
-				JSONObject user = GoogleCalendarContributor.this.retrieveUser(executionContext, accessToken);
-				if (user == null) throw new Exception("No user.");
-				if (! user.has(calendarIdentifier)) return false;
+					eventList = new ArrayList<String> ();
+					eventList.add("5678");
+					eventList.add("5679");
+				} else {
 
-				JSONObject gem = user.getJSONObject(calendarIdentifier);
-				if (! gem.has(eventIdentifier)) return false;
-
-				eventValue = gem.getString(eventIdentifier);
+					event = new HashMap<String, String> ();
+					event.put("location", eventIdentifier.equals("5678") ? "Vienna" : "Sterling");
+					event.put("start", "Start of event " + eventIdentifier);
+					event.put("end", "Start of event " + eventIdentifier);
+				}
 			} catch (Exception ex) {
 
 				throw new Xdi2MessagingException("Cannot load user data: " + ex.getMessage(), ex, null);
 			}
 
-			// add the event value to the response
+			// add the event list or event to the response
 
-			if (eventValue != null) {
+			if (eventList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				contextNode.createLiteral(eventValue);
+				for (String eventEntry : eventList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(new XDI3SubSegment("!" + eventEntry)));
+			}
+
+			if (event != null) {
+
+				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
+				for (Map.Entry<String, String> entry : event.entrySet()) {
+
+					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(new XDI3SubSegment("+" + entry.getKey()))).createLiteral(entry.getValue());
+				}
 			}
 
 			// done
