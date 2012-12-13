@@ -137,22 +137,6 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 
 			this.getContributors().addContributor(new CalendarContributor());
 		}
-
-		@Override
-		public boolean getContext(XDI3Segment[] contributorXris, XDI3Segment relativeContextNodeXri, XDI3Segment contextNodeXri, GetOperation operation, MessageResult messageResult, ExecutionContext executionContext) throws Xdi2MessagingException {
-
-			XDI3Segment googleCalendarContextXri = contributorXris[contributorXris.length - 3];
-			XDI3Segment userXri = contributorXris[contributorXris.length - 2];
-
-			log.debug("googleCalendarContextXri: " + googleCalendarContextXri + ", userXri: " + userXri);
-
-			ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-			contextNode.createContextNode(new XDI3SubSegment("$(+calendar)"));
-
-			// done
-
-			return true;
-		}
 	}
 
 	@ContributorXri(addresses={"$(+calendar)($)", "$(+calendar)"})
@@ -219,13 +203,13 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 			if (calendarList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				contextNode.createContextNode(new XDI3SubSegment("$(+event)"));
 				for (String calendarEntry : calendarList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(new XDI3SubSegment("!" + calendarEntry)));
 			}
 
 			if (calendar != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
+				contextNode.createContextNode(new XDI3SubSegment("$(+event)"));
 				for (Map.Entry<String, String> entry : calendar.entrySet()) {
 
 					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(new XDI3SubSegment("+" + entry.getKey()))).createLiteral(entry.getValue());
