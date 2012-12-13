@@ -274,7 +274,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 					event = new HashMap<String, String> ();
 					event.put("location", eventIdentifier.equals("5678") ? "Vienna" : "Sterling");
 					event.put("start", "Start of event " + eventIdentifier);
-					event.put("end", "Start of event " + eventIdentifier);
+					event.put("end", "End of event " + eventIdentifier);
 				}
 			} catch (Exception ex) {
 
