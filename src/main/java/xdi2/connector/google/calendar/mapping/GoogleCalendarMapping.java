@@ -13,7 +13,7 @@ import xdi2.core.xri3.impl.XDI3SubSegment;
 
 public class GoogleCalendarMapping {
 
-	public static final XDI3SubSegment XRI_S_GOOGLE_CALENDAR_CONTEXT = new XDI3SubSegment("+(https://www.googleapis.com/calendar/)");
+	public static final XDI3SubSegment XRI_S_GOOGLE_CALENDAR_CONTEXT = XDI3SubSegment.create("+(https://www.googleapis.com/calendar/)");
 
 	private static final Logger log = LoggerFactory.getLogger(GoogleCalendarMapping.class);
 

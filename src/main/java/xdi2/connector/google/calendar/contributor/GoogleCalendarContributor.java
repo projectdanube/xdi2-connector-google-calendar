@@ -203,16 +203,16 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 			if (calendarList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				for (String calendarEntry : calendarList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(new XDI3SubSegment("!" + calendarEntry)));
+				for (String calendarEntry : calendarList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(calendarEntry));
 			}
 
 			if (calendar != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				contextNode.createContextNode(new XDI3SubSegment("$(+event)"));
+				contextNode.createContextNode(XDI3SubSegment.create("$(+event)"));
 				for (Map.Entry<String, String> entry : calendar.entrySet()) {
 
-					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(new XDI3SubSegment("+" + entry.getKey()))).createLiteral(entry.getValue());
+					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
 				}
 			}
 
@@ -286,7 +286,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 			if (eventList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				for (String eventEntry : eventList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(new XDI3SubSegment("!" + eventEntry)));
+				for (String eventEntry : eventList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(eventEntry));
 			}
 
 			if (event != null) {
@@ -294,7 +294,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
 				for (Map.Entry<String, String> entry : event.entrySet()) {
 
-					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(new XDI3SubSegment("+" + entry.getKey()))).createLiteral(entry.getValue());
+					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
 				}
 			}
 
