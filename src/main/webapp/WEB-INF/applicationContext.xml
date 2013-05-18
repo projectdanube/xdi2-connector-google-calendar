@@ -43,7 +43,7 @@
 
 	<bean id="googleCalendarMappingGraphfactory" class="xdi2.core.impl.wrapped.classpath.ClasspathGraphFactory">
 		<property name="classpath" value="/xdi2/connector/google/calendar/mapping/mapping.xdi" />
-		<property name="mimeType" value="text/xdi;contexts=0;ordered=1" />
+		<property name="mimeType" value="text/xdi;ordered=1" />
 	</bean>
 
 	<bean id="googleCalendarMappingGraph" factory-bean="googleCalendarMappingGraphfactory" factory-method="openGraph" />
@@ -67,7 +67,7 @@
 		<property name="interceptors">
 			<util:list>
 				<bean class="xdi2.messaging.target.interceptor.impl.BootstrapInterceptor">
-					<property name="bootstrapOwner" value="=!1111" />
+					<property name="bootstrapOwner" value="[=]!1111" />
 					<property name="bootstrapSharedSecret" value="s3cret" />
 					<property name="bootstrapLinkContract" value="true" />
 				</bean>

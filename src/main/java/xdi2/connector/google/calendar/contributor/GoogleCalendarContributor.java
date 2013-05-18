@@ -15,7 +15,8 @@ import xdi2.connector.google.calendar.api.GoogleCalendarApi;
 import xdi2.connector.google.calendar.mapping.GoogleCalendarMapping;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
-import xdi2.core.features.multiplicity.Multiplicity;
+import xdi2.core.features.nodetypes.XdiAbstractInstanceUnordered;
+import xdi2.core.features.nodetypes.XdiAttributeSingleton;
 import xdi2.core.xri3.XDI3Segment;
 import xdi2.core.xri3.XDI3SubSegment;
 import xdi2.messaging.GetOperation;
@@ -203,7 +204,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 			if (calendarList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				for (String calendarEntry : calendarList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(calendarEntry));
+				for (String calendarEntry : calendarList) contextNode.createContextNode(XdiAbstractInstanceUnordered.createArcXri(calendarEntry));
 			}
 
 			if (calendar != null) {
@@ -212,7 +213,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 				contextNode.createContextNode(XDI3SubSegment.create("$(+event)"));
 				for (Map.Entry<String, String> entry : calendar.entrySet()) {
 
-					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
+					contextNode.createContextNode(XdiAttributeSingleton.createArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
 				}
 			}
 
@@ -286,7 +287,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 			if (eventList != null) {
 
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
-				for (String eventEntry : eventList) contextNode.createContextNode(Multiplicity.entityMemberArcXri(eventEntry));
+				for (String eventEntry : eventList) contextNode.createContextNode(XdiAbstractInstanceUnordered.createArcXri(eventEntry));
 			}
 
 			if (event != null) {
@@ -294,7 +295,7 @@ public class GoogleCalendarContributor extends AbstractContributor implements Me
 				ContextNode contextNode = messageResult.getGraph().findContextNode(contextNodeXri, true);
 				for (Map.Entry<String, String> entry : event.entrySet()) {
 
-					contextNode.createContextNode(Multiplicity.attributeSingletonArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
+					contextNode.createContextNode(XdiAttributeSingleton.createArcXri(XDI3SubSegment.create("+" + entry.getKey()))).createLiteral(entry.getValue());
 				}
 			}
 

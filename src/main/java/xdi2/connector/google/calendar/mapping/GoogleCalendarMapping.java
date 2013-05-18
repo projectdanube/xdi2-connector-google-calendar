@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import xdi2.core.Graph;
 import xdi2.core.exceptions.Xdi2RuntimeException;
-import xdi2.core.features.multiplicity.Multiplicity;
+import xdi2.core.features.nodetypes.XdiAbstractSubGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIReaderRegistry;
 import xdi2.core.xri3.XDI3Segment;
@@ -51,7 +51,7 @@ public class GoogleCalendarMapping {
 
 		// convert
 
-		String calendarIdentifier = (calendarXri.getNumSubSegments() < 2) ? null : Multiplicity.baseArcXri(calendarXri.getSubSegment(1)).toString();
+		String calendarIdentifier = (calendarXri.getNumSubSegments() < 2) ? null : XdiAbstractSubGraph.getBaseArcXri(calendarXri.getSubSegment(1)).toString();
 		if (calendarIdentifier != null && calendarIdentifier.startsWith("!")) calendarIdentifier = calendarIdentifier.substring(1);
 
 		// done
@@ -71,7 +71,7 @@ public class GoogleCalendarMapping {
 
 		// convert
 
-		String eventIdentifier = (eventXri.getNumSubSegments() < 2) ? null : Multiplicity.baseArcXri(eventXri.getSubSegment(1)).toString();
+		String eventIdentifier = (eventXri.getNumSubSegments() < 2) ? null : XdiAbstractSubGraph.getBaseArcXri(eventXri.getSubSegment(1)).toString();
 		if (eventIdentifier != null && eventIdentifier.startsWith("!")) eventIdentifier = eventIdentifier.substring(1);
 
 		// done
